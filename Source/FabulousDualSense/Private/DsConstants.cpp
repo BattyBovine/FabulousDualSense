@@ -6,6 +6,8 @@ const FName DsConstants::InputDeviceName{TEXTVIEW("DsInputDevice")};
 const FString DsConstants::HardwareDeviceIdentifier{TEXTVIEW("DualSense")};
 
 const FKey DsConstants::TouchpadKey{FName{TEXTVIEW("DsTouchpad")}};
+const FKey DsConstants::TouchpadKeyLeft{ FName{TEXTVIEW("DsTouchpadLeftButton")}};
+const FKey DsConstants::TouchpadKeyRight{ FName{TEXTVIEW("DsTouchpadRightButton")}};
 const FKey DsConstants::LogoKey{FName{TEXTVIEW("DsLogo")}};
 const FKey DsConstants::MuteKey{FName{TEXTVIEW("DsMute")}};
 
@@ -18,6 +20,11 @@ const FKey DsConstants::Touch2Key{FName{TEXTVIEW("DsTouch2")}};
 const FKey DsConstants::Touch2AxisXKey{FName{TEXTVIEW("DsTouch2AxisX")}};
 const FKey DsConstants::Touch2AxisYKey{FName{TEXTVIEW("DsTouch2AxisY")}};
 const FKey DsConstants::Touch2AxisXYKey{FName{TEXTVIEW("DsTouch2AxisXY")}};
+
+const FKey DsConstants::GyroscopeAxisRollKey{ FName{TEXTVIEW("DsGyroscopeRoll")} };
+const FKey DsConstants::GyroscopeAxisPitchKey{ FName{TEXTVIEW("DsGyroscopePitch")} };
+const FKey DsConstants::GyroscopeAxisYawKey{ FName{TEXTVIEW("DsGyroscopeYaw")} };
+const FKey DsConstants::GyroscopeAxisYawPitchKey{ FName{TEXTVIEW("DsGyroscopeYawPitch")} };
 
 const TMap<FGamepadKeyNames::Type, uint32>& DsConstants::GetRegularButtons()
 {

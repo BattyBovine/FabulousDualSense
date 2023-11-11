@@ -83,73 +83,85 @@ void FDsInputDevice::SendControllerEvents()
 
 		// Triggers.
 
-		if (PreviousInput.leftTrigger != Input.leftTrigger || Input.leftTrigger > DsConstants::TriggerDeadZone)
+		if (PreviousInput.leftTrigger != Input.leftTrigger)
 		{
 			MessageHandler->OnControllerAnalog(FGamepadKeyNames::LeftTriggerAnalog, PlatformUserId, InputDeviceId,
 			                                   Input.leftTrigger / static_cast<float>(TNumericLimits<uint8>::Max()));
 		}
 
-		if (PreviousInput.rightTrigger != Input.rightTrigger || Input.rightTrigger > DsConstants::TriggerDeadZone)
+		if (PreviousInput.rightTrigger != Input.rightTrigger)
 		{
 			MessageHandler->OnControllerAnalog(FGamepadKeyNames::RightTriggerAnalog, PlatformUserId, InputDeviceId,
 			                                   Input.rightTrigger / static_cast<float>(TNumericLimits<uint8>::Max()));
 		}
 
+		// Gyroscope.
+
+		// Gyroscope X represents Unreal Engine's pitch axis
+		if (PreviousInput.gyroscope.x != Input.gyroscope.x)
+		{
+			MessageHandler->OnControllerAnalog(DsConstants::GyroscopeAxisPitchKey.GetFName(), PlatformUserId, InputDeviceId,
+				Input.gyroscope.x * 0.0001);
+		}
+
+		// Gyroscope Y represents Unreal Engine's yaw axis
+		if (PreviousInput.gyroscope.y != Input.gyroscope.y)
+		{
+			MessageHandler->OnControllerAnalog(DsConstants::GyroscopeAxisYawKey.GetFName(), PlatformUserId, InputDeviceId,
+				Input.gyroscope.y * 0.0001);
+		}
+
+		// Gyroscope Z represents Unreal Engine's roll axis
+		if (PreviousInput.gyroscope.z != Input.gyroscope.z)
+		{
+			MessageHandler->OnControllerAnalog(DsConstants::GyroscopeAxisRollKey.GetFName(), PlatformUserId, InputDeviceId,
+				Input.gyroscope.z * 0.0001);
+		}
+
 		// Regular buttons.
 
-		auto ButtonIndex{0};
+		uint8 ButtonIndex = 0;
 
 		for (const auto& [ButtonName, ButtonFlag] : DsConstants::GetRegularButtons())
 		{
-			ProcessButton(ControllerId, PlatformUserId, InputDeviceId, ButtonName, ButtonIndex,
+			ProcessButton(ControllerId, PlatformUserId, InputDeviceId, ButtonName, ButtonIndex++,
 			              (PreviousInput.buttonMap & ButtonFlag) > 0,
 			              (Input.buttonMap & ButtonFlag) > 0, Time);
-			ButtonIndex += 1;
 		}
 
 		// Virtual buttons.
 
-		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickUp, ButtonIndex,
+		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickUp, ButtonIndex++,
 		              PreviousInput.leftStick.y > DsConstants::StickDeadZone, Input.leftStick.y > DsConstants::StickDeadZone, Time);
-		ButtonIndex += 1;
 
-		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickDown, ButtonIndex,
+		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickDown, ButtonIndex++,
 		              PreviousInput.leftStick.y < -DsConstants::StickDeadZone, Input.leftStick.y < -DsConstants::StickDeadZone, Time);
-		ButtonIndex += 1;
 
-		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickLeft, ButtonIndex,
+		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickLeft, ButtonIndex++,
 		              PreviousInput.leftStick.x < -DsConstants::StickDeadZone, Input.leftStick.x < -DsConstants::StickDeadZone, Time);
-		ButtonIndex += 1;
 
-		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickRight, ButtonIndex,
+		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickRight, ButtonIndex++,
 		              PreviousInput.leftStick.x > DsConstants::StickDeadZone, Input.leftStick.x > DsConstants::StickDeadZone, Time);
-		ButtonIndex += 1;
 
-		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickUp, ButtonIndex,
+		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickUp, ButtonIndex++,
 		              PreviousInput.rightStick.y > DsConstants::StickDeadZone, Input.rightStick.y > DsConstants::StickDeadZone, Time);
-		ButtonIndex += 1;
 
-		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickDown, ButtonIndex,
+		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickDown, ButtonIndex++,
 		              PreviousInput.rightStick.y < -DsConstants::StickDeadZone, Input.rightStick.y < -DsConstants::StickDeadZone, Time);
-		ButtonIndex += 1;
 
-		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickLeft, ButtonIndex,
+		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickLeft, ButtonIndex++,
 		              PreviousInput.rightStick.x < -DsConstants::StickDeadZone, Input.rightStick.x < -DsConstants::StickDeadZone, Time);
-		ButtonIndex += 1;
 
-		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickRight, ButtonIndex,
+		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickRight, ButtonIndex++,
 		              PreviousInput.rightStick.x > DsConstants::StickDeadZone, Input.rightStick.x > DsConstants::StickDeadZone, Time);
-		ButtonIndex += 1;
 
 		// Touch pad.
 
-		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, DsConstants::Touch1Key.GetFName(), ButtonIndex,
+		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, DsConstants::Touch1Key.GetFName(), ButtonIndex++,
 		              PreviousInput.touchPoint1.down, Input.touchPoint1.down, Time);
-		ButtonIndex += 1;
 
-		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, DsConstants::Touch2Key.GetFName(), ButtonIndex,
+		ProcessButton(ControllerId, PlatformUserId, InputDeviceId, DsConstants::Touch2Key.GetFName(), ButtonIndex++,
 		              PreviousInput.touchPoint2.down, Input.touchPoint2.down, Time);
-		ButtonIndex += 1;
 
 		ProcessTouch(PlatformUserId, InputDeviceId, DsConstants::Touch1AxisXKey.GetFName(),
 		             DsConstants::Touch1AxisYKey.GetFName(), PreviousInput.touchPoint1, Input.touchPoint1);
@@ -165,6 +177,24 @@ void FDsInputDevice::SendControllerEvents()
 			if (GetDefault<UDsSettings>()->bEmitMouseEventsFromTouchpad)
 			{
 				MessageHandler->OnRawMouseMove(TouchAxisX, TouchAxisY);
+			}
+
+			// Virtual touch pad left/right buttons.
+
+			const TMap<FName, uint32> &ButtonFlags = DsConstants::GetRegularButtons();
+			const uint32 TouchpadHalfWidth = DS_TOUCHPAD_WIDTH / 2;
+			const bool PreviousTouchpadKeyState = (PreviousInput.buttonMap &ButtonFlags[DsConstants::TouchpadKey.GetFName()]);
+			const bool CurrentTouchpadKeyState = (Input.buttonMap & ButtonFlags[DsConstants::TouchpadKey.GetFName()]);
+
+			if (Input.touchPoint1.x > TouchpadHalfWidth)
+			{
+				ProcessButton(ControllerId, PlatformUserId, InputDeviceId, DsConstants::TouchpadKeyRight.GetFName(), ButtonIndex++,
+					PreviousTouchpadKeyState, CurrentTouchpadKeyState, Time);
+			}
+			else
+			{
+				ProcessButton(ControllerId, PlatformUserId, InputDeviceId, DsConstants::TouchpadKeyLeft.GetFName(), ButtonIndex++,
+					PreviousTouchpadKeyState, CurrentTouchpadKeyState, Time);
 			}
 		}
 
@@ -483,11 +513,11 @@ void FDsInputDevice::DisconnectDevice(IPlatformInputDeviceMapper& InputDeviceMap
 
 		// Release sticks.
 
-		ReleaseStick(PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftAnalogX, Input.leftStick.x);
-		ReleaseStick(PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftAnalogY, Input.leftStick.y);
+		ReleaseStick(PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftAnalogX, 0);
+		ReleaseStick(PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftAnalogY, 0);
 
-		ReleaseStick(PlatformUserId, InputDeviceId, FGamepadKeyNames::RightAnalogX, Input.rightStick.x);
-		ReleaseStick(PlatformUserId, InputDeviceId, FGamepadKeyNames::RightAnalogY, Input.rightStick.y);
+		ReleaseStick(PlatformUserId, InputDeviceId, FGamepadKeyNames::RightAnalogX, 0);
+		ReleaseStick(PlatformUserId, InputDeviceId, FGamepadKeyNames::RightAnalogY, 0);
 
 		// Release triggers.
 
@@ -505,24 +535,27 @@ void FDsInputDevice::DisconnectDevice(IPlatformInputDeviceMapper& InputDeviceMap
 
 		for (const auto& [ButtonName, ButtonFlag] : DsConstants::GetRegularButtons())
 		{
-			ReleaseButton(PlatformUserId, InputDeviceId, ButtonName, (Input.buttonMap & ButtonFlag) > 0);
+			ReleaseButton(PlatformUserId, InputDeviceId, ButtonName, false);
 		}
 
 		// Release virtual buttons.
 
-		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickUp, Input.leftStick.y > DsConstants::StickDeadZone);
-		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickDown, Input.leftStick.y < -DsConstants::StickDeadZone);
-		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickLeft, Input.leftStick.x < -DsConstants::StickDeadZone);
-		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickRight, Input.leftStick.x > DsConstants::StickDeadZone);
-		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickUp, Input.rightStick.y > DsConstants::StickDeadZone);
-		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickDown, Input.rightStick.y < -DsConstants::StickDeadZone);
-		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickLeft, Input.rightStick.x < -DsConstants::StickDeadZone);
-		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickRight, Input.rightStick.x > DsConstants::StickDeadZone);
+		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickUp, false);
+		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickDown, false);
+		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickLeft, false);
+		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::LeftStickRight, false);
+		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickUp, false);
+		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickDown, false);
+		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickLeft, false);
+		ReleaseButton(PlatformUserId, InputDeviceId, FGamepadKeyNames::RightStickRight, false);
 
 		// Release touch pad.
 
-		ReleaseButton(PlatformUserId, InputDeviceId, DsConstants::Touch1Key.GetFName(), Input.touchPoint1.down);
-		ReleaseButton(PlatformUserId, InputDeviceId, DsConstants::Touch2Key.GetFName(), Input.touchPoint2.down);
+		ReleaseButton(PlatformUserId, InputDeviceId, DsConstants::Touch1Key.GetFName(), false);
+		ReleaseButton(PlatformUserId, InputDeviceId, DsConstants::Touch2Key.GetFName(), false);
+
+		ReleaseButton(PlatformUserId, InputDeviceId, DsConstants::TouchpadKeyLeft.GetFName(), false);
+		ReleaseButton(PlatformUserId, InputDeviceId, DsConstants::TouchpadKeyRight.GetFName(), false);
 	}
 
 	InputDeviceMapper.Internal_MapInputDeviceToUser(InputDeviceId, PlatformUserId, EInputDeviceConnectionState::Disconnected);
@@ -531,16 +564,11 @@ void FDsInputDevice::DisconnectDevice(IPlatformInputDeviceMapper& InputDeviceMap
 void FDsInputDevice::ProcessStick(const FPlatformUserId PlatformUserId, const FInputDeviceId InputDeviceId,
                                   const FGamepadKeyNames::Type& KeyName, const int8 PreviousValue, const int8 NewValue) const
 {
-	if (PreviousValue != NewValue || FMath::Abs(NewValue) > DsConstants::StickDeadZone)
-	{
-		const auto Scale{
-			NewValue <= 0
-				? 1.0f / -static_cast<float>(TNumericLimits<int8>::Min())
-				: 1.0f / static_cast<float>(TNumericLimits<int8>::Max())
-		};
+	const float Scale = NewValue <= 0
+		? 1.0f / -static_cast<float>(TNumericLimits<int8>::Min())
+		: 1.0f / static_cast<float>(TNumericLimits<int8>::Max());
 
-		MessageHandler->OnControllerAnalog(KeyName, PlatformUserId, InputDeviceId, NewValue * Scale);
-	}
+	MessageHandler->OnControllerAnalog(KeyName, PlatformUserId, InputDeviceId, NewValue * Scale);
 }
 
 void FDsInputDevice::ProcessButton(const int32 ControllerId, const FPlatformUserId PlatformUserId, const FInputDeviceId InputDeviceId,

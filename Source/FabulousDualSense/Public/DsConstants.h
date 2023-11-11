@@ -10,10 +10,11 @@ namespace DsConstants
 
 	inline constexpr auto MaxDevicesCount{4};
 	inline constexpr auto ButtonsCount{29};
-	inline constexpr auto StickDeadZone{30};
-	inline constexpr auto TriggerDeadZone{30};
+	inline constexpr auto StickDeadZone{10};
 
 	FABULOUSDUALSENSE_API extern const FKey TouchpadKey;
+	FABULOUSDUALSENSE_API extern const FKey TouchpadKeyLeft;
+	FABULOUSDUALSENSE_API extern const FKey TouchpadKeyRight;
 	FABULOUSDUALSENSE_API extern const FKey LogoKey;
 	FABULOUSDUALSENSE_API extern const FKey MuteKey;
 
@@ -26,6 +27,11 @@ namespace DsConstants
 	FABULOUSDUALSENSE_API extern const FKey Touch2AxisXKey;
 	FABULOUSDUALSENSE_API extern const FKey Touch2AxisYKey;
 	FABULOUSDUALSENSE_API extern const FKey Touch2AxisXYKey;
+
+	FABULOUSDUALSENSE_API extern const FKey GyroscopeAxisRollKey;
+	FABULOUSDUALSENSE_API extern const FKey GyroscopeAxisPitchKey;
+	FABULOUSDUALSENSE_API extern const FKey GyroscopeAxisYawKey;
+	FABULOUSDUALSENSE_API extern const FKey GyroscopeAxisYawPitchKey;
 
 	FABULOUSDUALSENSE_API const TMap<FGamepadKeyNames::Type, uint32>& GetRegularButtons();
 }
